@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Salary Prediction | ML Project</title>
+  <style>
+    /* ── Reset & Base ────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:      #2563eb;
+      --blue-dark: #1d4ed8;
+      --blue-soft: #eff6ff;
+      --blue-mid:  #bfdbfe;
+      --green:     #16a34a;
+      --green-soft:#f0fdf4;
+      --red:       #dc2626;
+      --red-soft:  #fef2f2;
+      --bg:        #f8fafc;
+      --surface:   #ffffff;
+      --border:    #e2e8f0;
+      --text:      #0f172a;
+      --muted:     #64748b;
+      --radius:    12px;
+      --shadow:    0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--text);
+      background: var(--bg);
+      min-height: 100vh;
+    }
+
+    /* ── Header ──────────────────────────────────────────── */
+    .site-header {
+      background: var(--blue);
+      color: #fff;
+      padding: 0 24px;
+    }
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      gap: 16px;
+    }
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .header-brand .icon {
+      width: 32px; height: 32px;
+      background: rgba(255,255,255,.2);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+    }
+    .header-badge {
+      font-size: 11px;
+      background: rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 20px;
+      padding: 3px 10px;
+      white-space: nowrap;
+    }
+
+    /* ── Hero ────────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #3b82f6 100%);
+      color: #fff;
+      padding: 56px 24px 60px;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: clamp(26px, 5vw, 40px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+    }
+    .hero p {
+      font-size: 16px;
+      opacity: .85;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* ── Layout ──────────────────────────────────────────── */
+    .main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px 64px;
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+    @media (max-width: 820px) {
+      .main { grid-template-columns: 1fr; }
+    }
+
+    /* ── Card ────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--blue);
+      flex-shrink: 0;
+    }
+
+    /* ── Input section ───────────────────────────────────── */
+    .input-section { grid-row: span 2; }
+
+    .form-group { margin-bottom: 18px; }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 7px;
+    }
+    .input-wrap { position: relative; }
+    .input-wrap .unit {
+      position: absolute;
+      right: 14px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .input-field {
+      width: 100%;
+      padding: 12px 48px 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 16px;
+      color: var(--text);
+      background: #fff;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      -moz-appearance: textfield;
+    }
+    .input-field::-webkit-inner-spin-button,
+    .input-field::-webkit-outer-spin-button { -webkit-appearance: none; }
+    .input-field:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+    }
+    .input-field.error-state { border-color: var(--red); box-shadow: 0 0 0 3px rgba(220,38,38,.1); }
+
+    .hint { font-size: 12px; color: var(--muted); margin-top: 5px; }
+
+    /* Quick-pick chips */
+    .chips {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-top: 14px; margin-bottom: 4px;
+    }
+    .chip {
+      padding: 5px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      font-size: 12.5px;
+      cursor: pointer;
+      background: var(--bg);
+      color: var(--text);
+      transition: all .15s;
+      user-select: none;
+    }
+    .chip:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-soft); }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 13px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all .15s;
+    }
+    .btn-primary {
+      background: var(--blue);
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    .btn-primary:hover { background: var(--blue-dark); transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--muted);
+      border: 1.5px solid var(--border);
+    }
+    .btn-secondary:hover { background: var(--border); color: var(--text); }
+    .btn-primary:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+    /* ── Result card ─────────────────────────────────────── */
+    .result-area {
+      min-height: 120px;
+      margin-top: 22px;
+      border-radius: 10px;
+      overflow: hidden;
+      transition: all .3s;
+    }
+    .result-hidden { display: none; }
+
+    .result-success {
+      background: var(--green-soft);
+      border: 1.5px solid #86efac;
+      border-radius: 10px;
+      padding: 22px 20px;
+      text-align: center;
+      animation: fadeUp .35s ease;
+    }
+    .result-success .label {
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .08em;
+      color: var(--green); margin-bottom: 6px;
+    }
+    .result-success .salary {
+      font-size: 36px; font-weight: 800;
+      color: var(--green); line-height: 1.1;
+    }
+    .result-success .sub {
+      font-size: 13px; color: #15803d; margin-top: 6px;
+    }
+    .result-success .disclaimer {
+      font-size: 11.5px; color: #166534;
+      margin-top: 10px; opacity: .75;
+      font-style: italic;
+    }
+
+    .result-error {
+      background: var(--red-soft);
+      border: 1.5px solid #fca5a5;
+      border-radius: 10px;
+      padding: 16px 18px;
+      color: var(--red);
+      font-size: 13.5px;
+      font-weight: 500;
+      display: flex; align-items: center; gap: 10px;
+      animation: fadeUp .25s ease;
+    }
+    .result-error .err-icon { font-size: 18px; flex-shrink: 0; }
+
+    /* Loading spinner */
+    .spinner {
+      display: inline-block;
+      width: 18px; height: 18px;
+      border: 2.5px solid rgba(255,255,255,.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    /* ── Stats row ───────────────────────────────────────── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 560px) { .stats-row { grid-template-columns: 1fr 1fr; } }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 14px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .stat-card .val {
+      font-size: 22px; font-weight: 700;
+      color: var(--blue); display: block;
+    }
+    .stat-card .lbl {
+      font-size: 11px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .05em;
+      margin-top: 2px;
+    }
+
+    /* ── About model ─────────────────────────────────────── */
+    .info-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    .info-table td { padding: 8px 4px; border-bottom: 1px solid var(--border); }
+    .info-table tr:last-child td { border-bottom: none; }
+    .info-table td:first-child { color: var(--muted); width: 45%; }
+    .info-table td:last-child { font-weight: 600; color: var(--text); }
+
+    /* ── How it works ────────────────────────────────────── */
+    .steps { display: flex; flex-direction: column; gap: 14px; }
+    .step {
+      display: flex; align-items: flex-start; gap: 14px;
+    }
+    .step-num {
+      width: 30px; height: 30px; flex-shrink: 0;
+      background: var(--blue); color: #fff;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700;
+    }
+    .step-body strong { display: block; font-size: 13.5px; margin-bottom: 2px; }
+    .step-body span { font-size: 12.5px; color: var(--muted); }
+
+    /* ── Model insights ──────────────────────────────────── */
+    .equation-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--blue);
+      border-radius: 6px;
+      padding: 14px 16px;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 13.5px;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+    .insight-text { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+    /* ── Plot ────────────────────────────────────────────── */
+    .plot-img {
+      width: 100%; border-radius: 8px;
+      border: 1px solid var(--border);
+      display: block;
+    }
+    .plot-caption {
+      font-size: 12px; color: var(--muted);
+      text-align: center; margin-top: 8px;
+    }
+
+    /* ── Tech badges ─────────────────────────────────────── */
+    .tech-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tech-badge {
+      padding: 5px 13px;
+      background: var(--blue-soft);
+      border: 1px solid var(--blue-mid);
+      border-radius: 20px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--blue);
+    }
+
+    /* ── Footer ──────────────────────────────────────────── */
+    .site-footer {
+      background: #0f172a;
+      color: #94a3b8;
+      text-align: center;
+      padding: 28px 24px;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    .site-footer strong { color: #e2e8f0; }
+
+    /* ── Animations ──────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ──────────────────────────────────────────── -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="icon">&#x1F4B0;</div>
+      Salary Prediction
+    </div>
+    <span class="header-badge">ML Internship Project</span>
+  </div>
+</header>
+
+<!-- ── Hero ────────────────────────────────────────────── -->
+<section class="hero">
+  <h1>Salary Prediction</h1>
+  <p>Predict expected salary based on years of professional experience using a trained Linear Regression model.</p>
+</section>
+
+<!-- ── Stats row ───────────────────────────────────────── -->
+<div style="max-width:1100px;margin:0 auto;padding:28px 24px 0;">
+  <div class="stats-row">
+    <div class="stat-card">
+      <span class="val">{{ "%.4f"|format(metrics.r2) }}</span>
+      <span class="lbl">R&sup2; Score</span>
+    </div>
+    <div class="stat-card">
+      <span class="val">${{ "{:,.0f}".format(metrics.mae) }}</span>
+      <span class="lbl">MAE</span>
+    </div>
+    <div class="stat-card">
+      <span class="val">{{ metrics.n_total }}</span>
+      <span class="lbl">Dataset Records</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── Main grid ───────────────────────────────────────── -->
+<main class="main">
+
+  <!-- ── Left column: input + result ──────────────────── -->
+  <div class="input-section">
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Predict Salary</div>
+
+      <div class="form-group">
+        <label for="years-input">Years of Experience</label>
+        <div class="input-wrap">
+          <input
+            type="number"
+            id="years-input"
+            class="input-field"
+            placeholder="e.g. 5.0"
+            min="0"
+            max="50"
+            step="0.1"
+            inputmode="decimal"
+            autocomplete="off"
+          />
+          <span class="unit">yrs</span>
+        </div>
+        <p class="hint">Dataset range: 1.1 – 10.5 years &nbsp;|&nbsp; Decimal values accepted (e.g. 3.5)</p>
+      </div>
+
+      <!-- Quick-pick chips -->
+      <div style="margin-bottom:20px;">
+        <p style="font-size:12px;color:var(--muted);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Quick pick</p>
+        <div class="chips">
+          <span class="chip" data-val="1">1 yr</span>
+          <span class="chip" data-val="3">3 yrs</span>
+          <span class="chip" data-val="5">5 yrs</span>
+          <span class="chip" data-val="7">7 yrs</span>
+          <span class="chip" data-val="10">10 yrs</span>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="predict-btn" onclick="predictSalary()">
+        Predict Salary
+      </button>
+      <button class="btn btn-secondary" onclick="resetForm()">
+        Reset / Clear
+      </button>
+
+      <!-- Result area -->
+      <div class="result-area result-hidden" id="result-area"></div>
+    </div>
+  </div>
+
+  <!-- ── Right column: info cards ──────────────────────── -->
+  <div style="display:flex;flex-direction:column;gap:28px;">
+
+    <!-- About the Model -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>About the Model</div>
+      <table class="info-table">
+        <tr><td>Algorithm</td>      <td>Linear Regression</td></tr>
+        <tr><td>Dataset Size</td>   <td>{{ metrics.n_total }} records</td></tr>
+        <tr><td>Training / Test</td><td>{{ metrics.n_train }} / {{ metrics.n_test }} samples (80/20 split)</td></tr>
+        <tr><td>Input Feature</td>  <td>Years of Experience</td></tr>
+        <tr><td>Target</td>         <td>Salary (USD)</td></tr>
+        <tr><td>R&sup2; Score</td>  <td>{{ "%.4f"|format(metrics.r2) }}</td></tr>
+        <tr><td>MAE</td>            <td>${{ "{:,.2f}".format(metrics.mae) }}</td></tr>
+        <tr><td>RMSE</td>           <td>${{ "{:,.2f}".format(metrics.rmse) }}</td></tr>
+      </table>
+    </div>
+
+    <!-- How it works -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>How It Works</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <strong>Enter Years of Experience</strong>
+            <span>Type or select the number of years of professional experience.</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <strong>Model Processes the Input</strong>
+            <span>The trained Linear Regression model applies the learned equation to the input.</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <strong>Predicted Salary is Displayed</strong>
+            <span>The estimated annual salary is shown instantly on the page.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Model Insights -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Model Insights</div>
+      <div class="equation-box">
+        Salary = {{ metrics.slope }} &times; YearsExperience + {{ "{:,.2f}".format(metrics.intercept) }}
+      </div>
+      <p class="insight-text">
+        The model learned a <strong>strong positive relationship</strong> between experience and salary from the dataset.
+        Each additional year of experience is associated with an estimated increase of
+        <strong>${{ "{:,.0f}".format(metrics.slope) }}</strong> in annual salary.
+        The R&sup2; score of <strong>{{ "%.4f"|format(metrics.r2) }}</strong> indicates that the model
+        explains approximately <strong>{{ (metrics.r2 * 100)|round(1) }}%</strong> of the variance in salaries.
+      </p>
+      <p class="insight-text" style="margin-top:10px;">
+        <em>Note: This is an educational project model trained on {{ metrics.n_total }} samples.
+        Results are indicative estimates and not guaranteed real-world salary figures.</em>
+      </p>
+    </div>
+
+  </div><!-- /right column -->
+
+  <!-- ── Full-width: regression plot ────────────────────── -->
+  <div class="card" style="grid-column: 1 / -1;">
+    <div class="card-title"><span class="dot"></span>Regression Plot — Salary vs. Years of Experience</div>
+    <img
+      src="/reports/regression_plot.png"
+      alt="Scatter plot with regression line showing salary vs years of experience"
+      class="plot-img"
+    />
+    <p class="plot-caption">
+      Blue dots = actual data points from salary_data.csv &nbsp;|&nbsp;
+      Red line = the trained Linear Regression line
+    </p>
+  </div>
+
+  <!-- ── Full-width: project info ───────────────────────── -->
+  <div class="card" style="grid-column: 1 / -1;">
+    <div class="card-title"><span class="dot"></span>Project Information</div>
+    <div class="tech-list">
+      <span class="tech-badge">Machine Learning</span>
+      <span class="tech-badge">Python 3</span>
+      <span class="tech-badge">Flask</span>
+      <span class="tech-badge">Scikit-learn</span>
+      <span class="tech-badge">Linear Regression</span>
+      <span class="tech-badge">HTML / CSS / JavaScript</span>
+      <span class="tech-badge">pandas</span>
+      <span class="tech-badge">NumPy</span>
+      <span class="tech-badge">joblib</span>
+      <span class="tech-badge">matplotlib</span>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── Footer ──────────────────────────────────────────── -->
+<footer class="site-footer">
+  <strong>IBM SkillsBuild – AICTE BharatCares Machine Learning &amp; Applied AI Internship 2026</strong><br>
+  Built using IBM BOB
+</footer>
+
+<!-- ── JavaScript ──────────────────────────────────────── -->
+<script>
+  const input     = document.getElementById('years-input');
+  const btn       = document.getElementById('predict-btn');
+  const resultBox = document.getElementById('result-area');
+
+  /* Quick-pick chips */
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      input.value = chip.dataset.val;
+      input.classList.remove('error-state');
+      resultBox.className = 'result-area result-hidden';
+      resultBox.innerHTML = '';
+    });
+  });
+
+  /* Predict on Enter key */
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') predictSalary();
+  });
+
+  function resetForm() {
+    input.value = '';
+    input.classList.remove('error-state');
+    resultBox.className = 'result-area result-hidden';
+    resultBox.innerHTML = '';
+    input.focus();
+  }
+
+  async function predictSalary() {
+    const raw = input.value.trim();
+
+    /* Client-side validation */
+    if (raw === '') {
+      showError('Please enter your years of experience.');
+      input.classList.add('error-state');
+      input.focus();
+      return;
+    }
+    const years = parseFloat(raw);
+    if (isNaN(years)) {
+      showError('Please enter a valid number.');
+      input.classList.add('error-state');
+      return;
+    }
+    if (years < 0) {
+      showError('Years of experience cannot be negative.');
+      input.classList.add('error-state');
+      return;
+    }
+
+    input.classList.remove('error-state');
+    setLoading(true);
+
+    try {
+      const res  = await fetch('/predict', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ years: years })
+      });
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        showError(data.error || 'Something went wrong. Please try again.');
+      } else {
+        showSuccess(data.formatted, data.years);
+      }
+    } catch (err) {
+      showError('Could not reach the server. Please make sure the app is running.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function showSuccess(formatted, years) {
+    resultBox.className = 'result-area';
+    resultBox.innerHTML = `
+      <div class="result-success">
+        <div class="label">Predicted Annual Salary</div>
+        <div class="salary">${formatted}</div>
+        <div class="sub">for ${years} year${years !== 1 ? 's' : ''} of experience</div>
+        <div class="disclaimer">
+          This is an educational estimate based on a dataset of 28 records.
+          Actual salaries may vary.
+        </div>
+      </div>`;
+  }
+
+  function showError(msg) {
+    resultBox.className = 'result-area';
+    resultBox.innerHTML = `
+      <div class="result-error">
+        <span class="err-icon">&#x26A0;</span>
+        <span>${msg}</span>
+      </div>`;
+  }
+
+  function setLoading(on) {
+    btn.disabled = on;
+    btn.innerHTML = on
+      ? '<span class="spinner"></span>Predicting...'
+      : 'Predict Salary';
+  }
+</script>
+
+</body>
+</html>

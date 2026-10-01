@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Salary Prediction — Project Report</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+      font-size: 15px;
+      line-height: 1.65;
+      color: #1f2328;
+      background: #ffffff;
+    }
+
+    .page {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 48px 32px 64px;
+    }
+
+    /* ── Header ─────────────────────────────────────── */
+    .header {
+      border-bottom: 3px solid #3b82d4;
+      padding-bottom: 20px;
+      margin-bottom: 36px;
+    }
+    .header .badge {
+      display: inline-block;
+      background: #3b82d4;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 3px;
+      margin-bottom: 12px;
+    }
+    .header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #1f2328;
+      margin-bottom: 6px;
+    }
+    .header .subtitle {
+      color: #57606a;
+      font-size: 14px;
+    }
+
+    /* ── Section ─────────────────────────────────────── */
+    section { margin-bottom: 40px; }
+
+    h2 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #1f2328;
+      margin-bottom: 14px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    p { margin-bottom: 10px; color: #1f2328; }
+
+    /* ── Metric cards ────────────────────────────────── */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+      margin-top: 4px;
+    }
+    .metric-card {
+      background: #f7f8fa;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 16px 18px;
+      text-align: center;
+    }
+    .metric-card .value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #3b82d4;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .metric-card .label {
+      font-size: 12px;
+      color: #57606a;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Tables ──────────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin-top: 4px;
+    }
+    thead tr { background: #f7f8fa; }
+    th {
+      text-align: left;
+      padding: 9px 12px;
+      font-weight: 600;
+      border-bottom: 2px solid #e5e7eb;
+      color: #57606a;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f7f8fa; }
+
+    /* ── Code blocks ─────────────────────────────────── */
+    pre {
+      background: #f7f8fa;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 16px;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 13px;
+      overflow-x: auto;
+      margin-top: 4px;
+    }
+    code { font-family: "Consolas", "Courier New", monospace; font-size: 13px; }
+
+    /* ── Inline highlight ────────────────────────────── */
+    .tag {
+      display: inline-block;
+      background: #e8f0fc;
+      color: #3b82d4;
+      border-radius: 3px;
+      padding: 1px 6px;
+      font-size: 12.5px;
+      font-family: "Consolas", "Courier New", monospace;
+    }
+
+    /* ── SVG chart ───────────────────────────────────── */
+    .chart-wrap {
+      background: #f7f8fa;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 20px 16px 10px;
+      margin-top: 4px;
+    }
+
+    /* ── File tree ───────────────────────────────────── */
+    .tree {
+      background: #f7f8fa;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 16px 20px;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    .tree .dir  { color: #3b82d4; font-weight: 600; }
+    .tree .file { color: #1f2328; }
+    .tree .note { color: #57606a; }
+
+    /* ── Footer ──────────────────────────────────────── */
+    .footer {
+      margin-top: 56px;
+      padding-top: 16px;
+      border-top: 1px solid #e5e7eb;
+      text-align: center;
+      font-size: 12px;
+      color: #57606a;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Header ─────────────────────────────────────── -->
+  <div class="header">
+    <span class="badge">IBM BOB Internship Project</span>
+    <h1>Salary Prediction Using Machine Learning</h1>
+    <div class="subtitle">
+      Linear Regression &nbsp;·&nbsp; Python &amp; Scikit-learn &nbsp;·&nbsp; 2024
+    </div>
+  </div>
+
+  <!-- ── 1. Overview ───────────────────────────────────── -->
+  <section>
+    <h2>1. Project Overview</h2>
+    <p>
+      This project demonstrates an end-to-end Machine Learning pipeline that predicts
+      an employee's annual <strong>Salary</strong> from their <strong>Years of Experience</strong>.
+      A <em>Linear Regression</em> model was trained using Python and Scikit-learn on a
+      real-world dataset of 28 observations.
+    </p>
+    <p>
+      The project is structured to be beginner-friendly and submission-ready, covering
+      every stage of a typical ML workflow: data loading, validation, training,
+      evaluation, model persistence, and a command-line prediction interface.
+    </p>
+  </section>
+
+  <!-- ── 2. Dataset ────────────────────────────────────── -->
+  <section>
+    <h2>2. Dataset</h2>
+    <table>
+      <thead>
+        <tr><th>Property</th><th>Value</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>File</td><td><span class="tag">salary_data.csv</span></td></tr>
+        <tr><td>Total rows</td><td>28 samples</td></tr>
+        <tr><td>Feature</td><td>YearsExperience (range: 1.1 – 10.5)</td></tr>
+        <tr><td>Target</td><td>Salary in USD (range: $37,731 – $122,391)</td></tr>
+        <tr><td>Missing values</td><td>None</td></tr>
+        <tr><td>Mean Salary</td><td>$75,370.50</td></tr>
+        <tr><td>Mean Experience</td><td>5.20 years</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── 3. Model Evaluation ───────────────────────────── -->
+  <section>
+    <h2>3. Model Performance</h2>
+    <p>
+      The dataset was split <strong>80 % training / 20 % test</strong> (random seed 42).
+      A <span class="tag">LinearRegression</span> estimator from Scikit-learn was
+      fitted on the training set and evaluated on the held-out test set.
+      All metrics below are computed from <em>actual predictions on unseen data</em>.
+    </p>
+
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <span class="value">0.9684</span>
+        <span class="label">R² Score</span>
+      </div>
+      <div class="metric-card">
+        <span class="value">$3,830</span>
+        <span class="label">MAE</span>
+      </div>
+      <div class="metric-card">
+        <span class="value">$4,837</span>
+        <span class="label">RMSE</span>
+      </div>
+      <div class="metric-card">
+        <span class="value">22 / 6</span>
+        <span class="label">Train / Test samples</span>
+      </div>
+    </div>
+
+    <p style="margin-top:16px;">
+      An R² of <strong>0.97</strong> means the model explains roughly
+      <strong>97 % of the variance</strong> in salaries — an excellent fit for a
+      single-feature linear model.
+    </p>
+  </section>
+
+  <!-- ── 4. Model Equation ─────────────────────────────── -->
+  <section>
+    <h2>4. Learned Model Equation</h2>
+    <p>The fitted linear equation is:</p>
+    <pre>Salary  =  9550.03 × YearsExperience  +  25613.67</pre>
+    <p>
+      Interpretation: each additional year of experience is associated with an
+      estimated salary increase of <strong>$9,550</strong>.
+      A candidate with zero experience would have a predicted baseline of <strong>$25,614</strong>.
+    </p>
+  </section>
+
+  <!-- ── 5. Scatter Plot (SVG) ─────────────────────────── -->
+  <section>
+    <h2>5. Data Visualisation</h2>
+    <p>Scatter plot of all 28 data points with the fitted regression line.</p>
+    <div class="chart-wrap">
+      <svg viewBox="0 0 640 360" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+        <!-- Axes -->
+        <line x1="60" y1="20" x2="60" y2="310" stroke="#e5e7eb" stroke-width="1.5"/>
+        <line x1="60" y1="310" x2="620" y2="310" stroke="#e5e7eb" stroke-width="1.5"/>
+
+        <!-- Y axis labels -->
+        <text x="55" y="314" text-anchor="end" font-size="11" fill="#57606a">0</text>
+        <text x="55" y="250" text-anchor="end" font-size="11" fill="#57606a">40k</text>
+        <text x="55" y="190" text-anchor="end" font-size="11" fill="#57606a">70k</text>
+        <text x="55" y="130" text-anchor="end" font-size="11" fill="#57606a">100k</text>
+        <text x="55" y="70"  text-anchor="end" font-size="11" fill="#57606a">130k</text>
+
+        <!-- Y grid lines -->
+        <line x1="60" y1="250" x2="620" y2="250" stroke="#e5e7eb" stroke-width="0.8" stroke-dasharray="4,3"/>
+        <line x1="60" y1="190" x2="620" y2="190" stroke="#e5e7eb" stroke-width="0.8" stroke-dasharray="4,3"/>
+        <line x1="60" y1="130" x2="620" y2="130" stroke="#e5e7eb" stroke-width="0.8" stroke-dasharray="4,3"/>
+        <line x1="60" y1="70"  x2="620" y2="70"  stroke="#e5e7eb" stroke-width="0.8" stroke-dasharray="4,3"/>
+
+        <!-- X axis labels (years) -->
+        <text x="60"  y="326" text-anchor="middle" font-size="11" fill="#57606a">1</text>
+        <text x="163" y="326" text-anchor="middle" font-size="11" fill="#57606a">3</text>
+        <text x="267" y="326" text-anchor="middle" font-size="11" fill="#57606a">5</text>
+        <text x="371" y="326" text-anchor="middle" font-size="11" fill="#57606a">7</text>
+        <text x="474" y="326" text-anchor="middle" font-size="11" fill="#57606a">9</text>
+        <text x="578" y="326" text-anchor="middle" font-size="11" fill="#57606a">11</text>
+
+        <!-- Axis titles -->
+        <text x="340" y="348" text-anchor="middle" font-size="12" fill="#57606a">Years of Experience</text>
+        <text x="14" y="170" text-anchor="middle" font-size="12" fill="#57606a" transform="rotate(-90,14,170)">Salary (USD)</text>
+
+        <!-- Helper: x_px = 60 + (years - 1) * 56.4,  y_px = 310 - (salary/1000 - 0) * 2.23 -->
+        <!-- Regression line: from (1.1, 36119) to (10.5, 125639) -->
+        <line x1="66" y1="230" x2="561" y2="30" stroke="#e05555" stroke-width="2.2"/>
+
+        <!-- Data points (steelblue dots) -->
+        <!-- (1.1, 39343) --> <circle cx="66"  cy="222" r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (1.3, 46205) --> <circle cx="77"  cy="207" r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (1.5, 37731) --> <circle cx="88"  cy="226" r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (2.0, 43525) --> <circle cx="116" cy="213" r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (2.2, 39891) --> <circle cx="127" cy="221" r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (2.9, 56642) --> <circle cx="167" cy="183" r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (3.0, 60150) --> <circle cx="173" cy="176" r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (3.2, 54445) --> <circle cx="184" cy="187" r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (3.2, 64445) --> <circle cx="184" cy="166" r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (3.7, 57189) --> <circle cx="212" cy="182" r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (3.9, 63218) --> <circle cx="223" cy="168" r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (4.0, 55794) --> <circle cx="229" cy="185" r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (4.0, 56957) --> <circle cx="229" cy="183" r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (4.5, 61111) --> <circle cx="257" cy="173" r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (4.9, 67938) --> <circle cx="279" cy="158" r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (5.1, 66029) --> <circle cx="290" cy="162" r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (5.3, 83088) --> <circle cx="301" cy="124" r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (5.9, 81363) --> <circle cx="335" cy="128" r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (6.0, 93940) --> <circle cx="340" cy="100" r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (6.8, 91738) --> <circle cx="385" cy="105" r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (7.1, 98273) --> <circle cx="402" cy="90"  r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (7.9,101302) --> <circle cx="447" cy="83"  r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (8.2,113812) --> <circle cx="464" cy="55"  r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (8.7,109431) --> <circle cx="492" cy="65"  r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (9.0,105582) --> <circle cx="508" cy="74"  r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (9.5,116969) --> <circle cx="537" cy="48"  r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (10.3,122391)--> <circle cx="582" cy="37"  r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <!-- (10.5,121872)--> <circle cx="593" cy="38"  r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+
+        <!-- Legend -->
+        <circle cx="80"  cy="40" r="5" fill="#4a90c4" stroke="#fff" stroke-width="1.5"/>
+        <text   x="90"   y="44" font-size="12" fill="#57606a">Actual data</text>
+        <line x1="155" y1="40" x2="185" y2="40" stroke="#e05555" stroke-width="2.2"/>
+        <text  x="190"  y="44" font-size="12" fill="#57606a">Regression line</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ── 6. Project Structure ───────────────────────────── -->
+  <section>
+    <h2>6. Project Structure</h2>
+    <div class="tree">
+      <span class="dir">IBM_BOB_Salary_Project/</span><br>
+      &nbsp;&nbsp;&#x251C;&#x2500;&#x2500; <span class="file">salary_data.csv</span> &nbsp;<span class="note">← dataset</span><br>
+      &nbsp;&nbsp;&#x251C;&#x2500;&#x2500; <span class="file">requirements.txt</span><br>
+      &nbsp;&nbsp;&#x251C;&#x2500;&#x2500; <span class="file">README.md</span><br>
+      &nbsp;&nbsp;&#x251C;&#x2500;&#x2500; <span class="dir">src/</span><br>
+      &nbsp;&nbsp;&#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; <span class="file">data_loader.py</span> &nbsp;<span class="note">← load &amp; validate CSV</span><br>
+      &nbsp;&nbsp;&#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; <span class="file">train_model.py</span> &nbsp;<span class="note">← train, evaluate, save</span><br>
+      &nbsp;&nbsp;&#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; <span class="file">predict.py</span> &nbsp;<span class="note">← prediction helper</span><br>
+      &nbsp;&nbsp;&#x251C;&#x2500;&#x2500; <span class="dir">app/</span><br>
+      &nbsp;&nbsp;&#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; <span class="file">app.py</span> &nbsp;<span class="note">← CLI user interface</span><br>
+      &nbsp;&nbsp;&#x251C;&#x2500;&#x2500; <span class="dir">models/</span><br>
+      &nbsp;&nbsp;&#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; <span class="file">salary_model.pkl</span> &nbsp;<span class="note">← saved model</span><br>
+      &nbsp;&nbsp;&#x2514;&#x2500;&#x2500; <span class="dir">reports/</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; <span class="file">regression_plot.png</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; <span class="file">metrics.json</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; <span class="file">project_report.html</span>
+    </div>
+  </section>
+
+  <!-- ── 7. How to Run ──────────────────────────────────── -->
+  <section>
+    <h2>7. How to Run</h2>
+    <p><strong>Step 1 — Install dependencies</strong></p>
+    <pre>pip install -r requirements.txt</pre>
+    <p style="margin-top:12px;"><strong>Step 2 — Train the model</strong></p>
+    <pre>python src/train_model.py</pre>
+    <p style="margin-top:12px;"><strong>Step 3 — Launch the CLI application</strong></p>
+    <pre>python app/app.py</pre>
+    <p style="margin-top:10px;">
+      At the prompt, enter a number (e.g. <span class="tag">5.0</span>) and press
+      <kbd style="background:#f7f8fa;border:1px solid #e5e7eb;border-radius:3px;padding:1px 5px;font-size:12px;">Enter</kbd>
+      to see the predicted salary. Type <span class="tag">quit</span> to exit.
+    </p>
+  </section>
+
+  <!-- ── 8. Tech Stack ──────────────────────────────────── -->
+  <section>
+    <h2>8. Technologies Used</h2>
+    <table>
+      <thead><tr><th>Library</th><th>Version</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>Python</td><td>3.8+</td><td>Core language</td></tr>
+        <tr><td>pandas</td><td>&ge;2.0</td><td>Data loading and manipulation</td></tr>
+        <tr><td>NumPy</td><td>&ge;1.24</td><td>Numerical operations</td></tr>
+        <tr><td>scikit-learn</td><td>&ge;1.3</td><td>LinearRegression, train_test_split, metrics</td></tr>
+        <tr><td>matplotlib</td><td>&ge;3.7</td><td>Regression scatter plot</td></tr>
+        <tr><td>joblib</td><td>&ge;1.3</td><td>Model serialisation (save / load)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── Footer ────────────────────────────────────────── -->
+  <div class="footer">Made with IBM Bob</div>
+
+</div>
+</body>
+</html>
