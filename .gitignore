@@ -3,8 +3,7 @@ __pycache__/
 *.py[cod]
 *.pyo
 
-# Trained model (regenerate with: python src/train_model.py)
-models/salary_model.pkl
+
 
 # Virtual environments
 venv/
